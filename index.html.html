@@ -1,0 +1,4222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>高潮管理日历</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0A0A1A;
+            --bg-secondary: #121228;
+            --bg-glass: rgba(18, 18, 40, 0.85);
+            --bg-card-hover: rgba(76, 75, 219, 0.08);
+            --bg-button-disabled: #2A2A44;
+
+            --primary: #4C4BDB;
+            --primary-hover: #3A39B8;
+            --primary-light: rgba(76, 75, 219, 0.12);
+
+            --secondary: #A569E0;
+            --success: #00B894;
+            --warning: #E09C3A;
+            --danger: #E04D5F;
+
+            --text-primary: #F8F9FA;
+            --text-secondary: #A9ACB6;
+            --text-muted: #7A7A9E;
+            --text-on-primary: #F8F9FA;
+            --text-on-success: #121228;
+            --text-on-warning: #121228;
+            --text-on-danger: #F8F9FA;
+
+            --border: #2A2A44;
+            --border-primary: #4C4BDB;
+            --border-secondary: #A569E0;
+            --border-warning: #E09C3A;
+            --divider: rgba(255, 255, 255, 0.08);
+
+            --shadow-card: 0 6px 24px rgba(0, 0, 0, 0.3);
+            --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --glow-primary: 0 0 12px rgba(76, 75, 219, 0.3);
+            --glow-success: 0 0 10px rgba(0, 184, 148, 0.25);
+
+            --gradient-title: linear-gradient(135deg, #4C4BDB, #A569E0);
+            --gradient-progress: linear-gradient(90deg, #4C4BDB, #A569E0);
+            --gradient-success: linear-gradient(90deg, #00B894, #008F72);
+            --gradient-button: linear-gradient(135deg, #4C4BDB, #6A67D9);
+
+            --neutral-gray: #3A3A5E;
+            --eternal-purple: #8E44AD;
+            --gold-color: #D4AF37;
+            --eternal-gold: #FFD700;
+
+            --app-width: 375px;
+            --app-height: 667px;
+            --header-height: 12vh;
+            --nav-height: 10vh;
+            --content-height: calc(100vh - var(--header-height) - var(--nav-height));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            position: relative;
+            min-height: 100vh;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .outer-container {
+            width: 100%;
+            max-width: var(--app-width);
+            height: 100vh;
+            max-height: var(--app-height);
+            position: relative;
+            margin: 0 auto;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-modal);
+        }
+
+        #app-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--bg-primary);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+            border: none;
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-card);
+        }
+
+        .header {
+            height: var(--header-height);
+            min-height: 70px;
+            max-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            position: relative;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--divider);
+            overflow: hidden;
+        }
+
+        .main-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            position: relative;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(76, 75, 219, 0.7);
+            animation: titleGlow 3s infinite alternate ease-in-out;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        @keyframes titleGlow {
+            0% { 
+                opacity: 0.9; 
+                text-shadow: 0 0 10px rgba(76, 75, 219, 0.7); 
+            }
+            50% { 
+                opacity: 1; 
+                text-shadow: 0 0 20px rgba(76, 75, 219, 0.9), 0 0 30px rgba(165, 105, 224, 0.5); 
+            }
+            100% { 
+                opacity: 0.9; 
+                text-shadow: 0 0 15px rgba(76, 75, 219, 0.7); 
+            }
+        }
+
+        .main-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gradient-progress);
+            animation: titleLine 3s infinite alternate ease-in-out;
+            box-shadow: 0 0 10px rgba(76, 75, 219, 0.5);
+        }
+
+        @keyframes titleLine {
+            0% { 
+                opacity: 0.6; 
+                transform: scaleX(0.9); 
+                box-shadow: 0 0 5px rgba(76, 75, 219, 0.3);
+            }
+            100% { 
+                opacity: 1; 
+                transform: scaleX(1.1); 
+                box-shadow: 0 0 15px rgba(76, 75, 219, 0.7);
+            }
+        }
+
+        .sub-title {
+            font-size: 1rem;
+            color: #e0e0ff;
+            margin-top: 5px;
+            font-weight: 600;
+            position: relative;
+            animation: subtitleFloat 3s infinite ease-in-out;
+            letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 8px rgba(165, 105, 224, 0.5);
+        }
+
+        @keyframes subtitleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+
+        .content-area {
+            flex: 1;
+            height: var(--content-height);
+            overflow-y: auto;
+            padding: 15px;
+            position: relative;
+        }
+
+        .page {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .navigation {
+            height: var(--nav-height);
+            min-height: 60px;
+            max-height: 80px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--divider);
+        }
+
+        .nav-btn {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: none;
+            border: none;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            font-weight: 500;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .nav-btn.active {
+            color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .nav-btn i {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        .nav-btn.is-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--bg-button-disabled);
+        }
+
+        .nav-btn.is-disabled:hover::before {
+            left: -100%;
+        }
+
+        .nav-btn.is-disabled:hover i {
+            transform: none;
+        }
+
+        .welcome-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(76,75,219,0.1), transparent);
+            opacity: 0.08;
+            z-index: -1;
+            animation: bgPulse 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes bgPulse {
+            0% { opacity: 0.05; }
+            100% { opacity: 0.15; }
+        }
+
+        .logo-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .logo-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            letter-spacing: 5px;
+            background: var(--gradient-title);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 0 5px rgba(165,105,224,0.3));
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .logo-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--secondary), transparent 70%);
+            opacity: 0.3;
+            filter: blur(20px);
+            z-index: 0;
+        }
+
+        .typing-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            min-height: 60px;
+        }
+
+        .letter {
+            display: inline-block;
+            position: relative;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px var(--secondary);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .cursor {
+            position: absolute;
+            right: -5px;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background-color: var(--secondary);
+            animation: blink 1.5s infinite;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .slogan-container {
+            padding: 20px;
+            border-radius: 20px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-card);
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
+        }
+
+        .slogan-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        .slogan {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0;
+            transition: opacity 0.5s;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(76, 75, 219, 0.5);
+        }
+
+        .slogan.show {
+            opacity: 1;
+        }
+
+        .transition-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-primary);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: var(--shadow-modal);
+            position: relative;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--divider);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-primary);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--border-primary);
+            box-shadow: 0 0 0 3px rgba(76, 75, 219, 0.2);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--text-on-primary);
+            box-shadow: var(--glow-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 0 20px rgba(76, 75, 219, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--text-on-primary);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 0 15px rgba(165, 105, 224, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--text-on-success);
+            box-shadow: var(--glow-success);
+        }
+
+        .btn-warning {
+            background: transparent;
+            color: var(--warning);
+            border: 1px dashed var(--warning);
+            border-radius: 10px;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--text-on-danger);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 0 15px rgba(224, 77, 95, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn.is-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+            background: var(--bg-button-disabled);
+        }
+
+        .btn.is-disabled:hover::before {
+            left: -100%;
+        }
+
+        .project-list {
+            list-style: none;
+        }
+
+        .project-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--gradient-progress);
+        }
+
+        .project-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-card);
+            background: var(--bg-card-hover);
+            border-color: var(--border-primary);
+        }
+
+        .project-info {
+            flex: 1;
+        }
+
+        .project-info h3 {
+            margin-bottom: 5px;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .project-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .project-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .calendar-container {
+            width: 100%;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            justify-content: space-between;
+        }
+
+        .calendar-nav-btn {
+            flex: 1;
+            padding: 10px 8px;
+            font-size: 0.85rem;
+        }
+
+        .calendar-nav-btn.today {
+            flex: 1;
+        }
+
+        .calendar-nav-btn.restricted {
+            flex: 2;
+        }
+
+        .calendar-nav-btn.highlight {
+            flex: 2;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 10px 0;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            background: var(--neutral-gray);
+            position: relative;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .calendar-day:hover {
+            background: var(--primary-light);
+            transform: scale(1.03);
+            box-shadow: var(--glow-primary);
+        }
+
+        .calendar-day.today {
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            position: relative;
+        }
+
+        .calendar-day.today.eternal {
+            border: 2px solid var(--eternal-gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.7);
+        }
+
+        .calendar-day.today::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: breath 2s infinite ease-in-out;
+        }
+
+        .calendar-day.today.eternal::before {
+            background: var(--eternal-gold);
+            box-shadow: 0 0 5px var(--eternal-gold);
+        }
+
+        @keyframes breath {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .calendar-day.highlight {
+            background: radial-gradient(circle, var(--secondary), transparent 70%);
+            border: 1px solid var(--secondary);
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .calendar-day.restricted {
+            background-image: repeating-linear-gradient(45deg, transparent, var(--warning) 1px, transparent 2px);
+            border: 1px dashed var(--warning);
+        }
+
+        .day-markers {
+            position: absolute;
+            bottom: 2px;
+            display: flex;
+            gap: 2px;
+        }
+
+        .day-marker {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .day-marker.highlight {
+            background-color: var(--success);
+            box-shadow: 0 0 5px var(--success);
+        }
+
+        .day-marker.restricted {
+            background-color: var(--danger);
+            box-shadow: 0 0 5px var(--danger);
+        }
+
+        .day-status-text {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 1px 3px;
+            border-radius: 3px;
+            color: white;
+        }
+
+        .day-status-text.highlight {
+            background-color: var(--success);
+        }
+
+        .day-status-text.restricted {
+            background-color: var(--danger);
+        }
+
+        .project-color-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .status-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .status-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .status-btn.is-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+            background: var(--bg-button-disabled);
+        }
+
+        .btn-restricted {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-restricted:not(.is-disabled):hover {
+            box-shadow: 0 0 15px rgba(224, 77, 95, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-highlight {
+            background: var(--success);
+            color: var(--text-on-success);
+        }
+
+        .btn-highlight:not(.is-disabled):hover {
+            box-shadow: var(--glow-success);
+            transform: translateY(-2px);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-title);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 10px;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: var(--glow-primary);
+            position: relative;
+        }
+
+        .eternal-avatar {
+            background: linear-gradient(135deg, var(--eternal-gold), #DAA520) !important;
+            color: var(--eternal-purple) !important;
+            text-shadow: 0 0 10px rgba(142, 68, 173, 0.7);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.7), 0 0 25px rgba(212, 175, 55, 0.5);
+            animation: eternalAvatar 3s infinite alternate;
+        }
+
+        /* 永恒者头像脉冲效果 */
+        .eternal-avatar::before,
+        .eternal-avatar::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid var(--eternal-gold);
+            left: -10px;
+            top: -10px;
+            right: -10px;
+            bottom: -10px;
+            opacity: 0;
+            animation: eternalPulse 3s infinite;
+        }
+
+        .eternal-avatar::after {
+            animation-delay: 1s;
+        }
+
+        .eternal-avatar .pulse-3 {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid var(--eternal-gold);
+            left: -10px;
+            top: -10px;
+            right: -10px;
+            bottom: -10px;
+            opacity: 0;
+            animation: eternalPulse 3s infinite;
+            animation-delay: 2s;
+        }
+
+        @keyframes eternalPulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes eternalAvatar {
+            0% { 
+                box-shadow: 0 0 15px rgba(212, 175, 55, 0.7), 0 0 25px rgba(212, 175, 55, 0.5);
+            }
+            100% { 
+                box-shadow: 0 0 20px rgba(212, 175, 55, 0.9), 0 0 30px rgba(212, 175, 55, 0.7), 0 0 40px rgba(142, 68, 173, 0.5);
+            }
+        }
+
+        .eternal-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--eternal-purple);
+            color: white;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transform: none;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .eternal-name {
+            background: linear-gradient(135deg, var(--gold-color), #DAA520);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .crown-icon {
+            color: var(--eternal-gold);
+            font-size: 1.2rem;
+            text-shadow: none;
+            filter: none;
+            animation: none;
+        }
+
+        .profile-bio {
+            color: var(--text-secondary);
+        }
+
+        .profile-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .profile-btn {
+            padding: 15px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .profile-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-card);
+            background: var(--bg-card-hover);
+            border-color: var(--border-primary);
+        }
+
+        .profile-btn i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .eternal-list {
+            max-height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .eternal-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--divider);
+            transition: all 0.3s;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .eternal-item:hover {
+            background: var(--bg-card-hover);
+            transform: translateX(5px);
+        }
+
+        .ticket {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-family: 'Courier New', monospace;
+            color: #333;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23f5f5f5' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+            background-size: cover;
+            border-left: 5px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticket::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: repeating-linear-gradient(to right, #333, #333 5px, transparent 5px, transparent 10px);
+        }
+
+        .ticket::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: repeating-linear-gradient(to right, #333, #333 5px, transparent 5px, transparent 10px);
+        }
+
+        .ticket:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .ticket.is-expired {
+            opacity: 0.7;
+            background: rgba(128, 128, 128, 0.1);
+            border-left-color: #888;
+        }
+
+        .ticket-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #333;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .ticket-header::after {
+            content: 'XPG';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+            padding: 2px 5px;
+            border-radius: 3px;
+            opacity: 0.8;
+        }
+
+        .eternal-stamp {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: var(--eternal-purple);
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border: 2px solid var(--eternal-purple);
+            border-radius: 3px;
+            transform: none;
+            opacity: 0.9;
+        }
+
+        .ticket-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .ticket-label {
+            font-weight: bold;
+            color: #666;
+        }
+
+        .ticket-value {
+            text-align: right;
+        }
+
+        .stats-container {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-family: 'Courier New', monospace;
+            color: #333;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23f5f5f5' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+            background-size: cover;
+            border-left: 5px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: repeating-linear-gradient(to right, #333, #333 5px, transparent 5px, transparent 10px);
+        }
+
+        .stats-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: repeating-linear-gradient(to right, #333, #333 5px, transparent 5px, transparent 10px);
+        }
+
+        .stats-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #333;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .stats-header::after {
+            content: 'XPG';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+            padding: 2px 5px;
+            border-radius: 3px;
+            opacity: 0.8;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .stats-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stats-value {
+            color: #333;
+        }
+
+        .stats-footer {
+            text-align: center;
+            margin-top: 15px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .dice-container {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .dice {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            color: #333;
+        }
+
+        .dice::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .dice.is-rolling {
+            animation: roll 0.5s ease-in-out infinite;
+        }
+
+        @keyframes roll {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .dice-result {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            color: var(--text-primary);
+        }
+
+        .rules-explanation {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-left: 4px solid var(--primary);
+        }
+
+        .rules-explanation h4 {
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .rules-explanation ul {
+            padding-left: 20px;
+        }
+
+        .rules-explanation li {
+            margin-bottom: 5px;
+        }
+
+        .project-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .project-detail-item {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 10px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .project-detail-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .project-detail-value {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .highlight-days-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .highlight-day {
+            background: var(--success);
+            color: var(--text-on-success);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* 新增项目卡片样式 */
+        .project-ticket {
+            width: 100%;
+            max-width: 360px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        /* 根据项目状态设置边框颜色 */
+        .project-ticket[data-status="active"] {
+            border: 2px solid var(--success);
+        }
+
+        .project-ticket[data-status="waiting"] {
+            border: 2px solid var(--warning);
+        }
+
+        .project-ticket[data-status="completed"] {
+            border: 2px solid var(--danger);
+        }
+
+        .project-ticket .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .project-ticket .ticket-title {
+            padding: 18px 20px 8px;
+            text-align: left;
+            background: var(--bg-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-ticket .ticket-title h3 {
+            font: 900 1.3rem 'Orbitron';
+            letter-spacing: 1px;
+            line-height: 1.2;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .project-ticket .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .project-ticket .delete-btn:hover {
+            color: var(--danger);
+            background: rgba(224, 77, 95, 0.1);
+        }
+
+        .project-ticket .info-pair {
+            padding: 0 20px 14px;
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            background: var(--bg-secondary);
+        }
+
+        .project-ticket .info-left, .project-ticket .info-right {
+            flex: 1;
+            font: 500 0.84rem/1.55;
+            color: var(--text-secondary);
+        }
+
+        .project-ticket .info-left span, .project-ticket .info-right span {
+            display: block;
+            white-space: nowrap;
+        }
+
+        .project-ticket .info-left { text-align: left; }
+        .project-ticket .info-right { 
+            text-align: right;
+            font-feature-settings: "tnum" 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .project-ticket .info-left span:last-child { white-space: normal; }
+
+        .project-ticket .ticket-body { 
+            padding: 14px 20px; 
+            background: var(--bg-primary);
+        }
+        .project-ticket .data-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 0.84rem;
+        }
+
+        .project-ticket .data-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .project-ticket .data-label {
+            opacity: 0.7;
+            font-weight: 500;
+            margin-bottom: 2px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .project-ticket .data-value {
+            font-weight: 700;
+            font-size: 1rem;
+            font-feature-settings: "tnum" 1;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+        }
+
+        .project-ticket .data-value small {
+            font-weight: 500;
+            opacity: 0.8;
+            font-size: 0.8em;
+        }
+
+        .project-ticket .tear-line {
+            display: flex;
+            align-items: center;
+            height: 24px;
+            position: relative;
+            background: var(--bg-primary);
+        }
+
+        .project-ticket .notch {
+            width: 18px;
+            height: 18px;
+            background: var(--bg-primary);
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .project-ticket .notch.left {
+            left: calc(-1 * 18px/2);
+            border-radius: 0 50% 50% 0;
+        }
+
+        .project-ticket .notch.right {
+            right: calc(-1 * 18px/2);
+            border-radius: 50% 0 0 50%;
+        }
+
+        .project-ticket .dash {
+            flex: 1;
+            height: 1px;
+            background: repeating-linear-gradient(90deg, var(--text-secondary) 0, var(--text-secondary) 3px, transparent 3px, transparent 6px);
+            margin: 0 12px;
+        }
+
+        .project-ticket .ticket-footer {
+            padding: 16px 20px;
+            background: rgba(10,10,26,0.85);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .project-ticket .auth-qr-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .project-ticket .auth-info {
+            flex: 1;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .project-ticket .auth-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-ticket .auth-label {
+            opacity: 0.7;
+            font-weight: 500;
+            margin-bottom: 1px;
+            color: var(--text-secondary);
+        }
+
+        .project-ticket .auth-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .project-ticket .qrcode-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .project-ticket .qrcode {
+            width: 60px;
+            height: 60px;
+            background: #FFFFFF;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .project-ticket .qrcode img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .project-ticket .qrcode-hint {
+            font-size: 0.65rem;
+            color: #B0B0D9;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .project-ticket .score-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255,255,255,0.15);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            color: var(--gold-color);
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .project-ticket .score-label { opacity: 0.9; }
+        .project-ticket .score-value { font-size: 1.4rem; }
+
+        .project-ticket .status-stamp {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            width: 80px;
+            height: 40px;
+            opacity: 1;
+            pointer-events: none;
+            border: 3px solid currentColor;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font: 900 1.6rem 'Orbitron';
+            color: currentColor;
+            text-align: center;
+            animation: stampIn 0.6s ease-out;
+            box-shadow: 0 0 12px rgba(255,255,255,0.2);
+        }
+
+        @keyframes stampIn {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-30deg); opacity: 0; }
+            70% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
+        }
+
+        .project-ticket[data-status="active"] .status-stamp { color: var(--success); }
+        .project-ticket[data-status="waiting"] .status-stamp { color: var(--warning); }
+        .project-ticket[data-status="completed"] .status-stamp { color: var(--danger); }
+
+        /* 项目选择下拉框样式 */
+        .project-selector {
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .project-selector-header {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .project-selector-header:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-primary);
+        }
+
+        .project-selector-header.active {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .project-selector-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .project-selector-arrow {
+            transition: transform 0.3s;
+        }
+
+        .project-selector-arrow.active {
+            transform: rotate(180deg);
+        }
+
+        .project-selector-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .project-selector-list.active {
+            display: block;
+        }
+
+        .project-selector-item {
+            display: flex;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--divider);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .project-selector-item:last-child {
+            border-bottom: none;
+        }
+
+        .project-selector-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .project-selector-item.active {
+            background: var(--primary-light);
+        }
+
+        .project-selector-number {
+            width: 40px;
+            font-weight: 600;
+            color: var(--primary);
+            font-feature-settings: "tnum" 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .project-selector-name {
+            flex: 1;
+            color: var(--text-primary);
+        }
+
+        .project-selector-status {
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .project-selector-status.active {
+            background: var(--success);
+            color: var(--text-on-success);
+        }
+
+        .project-selector-status.waiting {
+            background: var(--warning);
+            color: var(--text-on-warning);
+        }
+
+        .project-selector-status.completed {
+            background: var(--danger);
+            color: var(--text-on-danger);
+        }
+
+        @media (max-width: 450px) {
+            .outer-container {
+                max-width: 100%;
+                max-height: 100vh;
+                border-radius: 0;
+                border: none;
+            }
+            
+            .logo-text {
+                font-size: 2.5rem;
+            }
+            
+            .slogan {
+                font-size: 1rem;
+            }
+            
+            .project-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        .title-xl {
+            font-family: 'Orbitron', 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            line-height: 1.2;
+            letter-spacing: 2px;
+        }
+
+        .title-lg {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .title-md {
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .text-body {
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .text-sm {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .number-highlight {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: 3px;
+        }
+
+        .text-gradient {
+            background: var(--gradient-title);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 900;
+        }
+
+        /* 联系作者模态窗口样式 */
+        .contact-modal .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .contact-modal .btn {
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-modal .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        .contact-modal .btn i {
+            font-size: 1.2rem;
+        }
+
+        .contact-modal .btn.twitter { background: linear-gradient(135deg, #1DA1F2, #0D8BD9); color: white; }
+        .contact-modal .btn.telegram { background: linear-gradient(135deg, #229ED9, #1C7BB3); color: white; }
+        .contact-modal .btn.channel { background: linear-gradient(135deg, #27AE60, #1E8449); color: white; }
+        .contact-modal .btn.qr { background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text-muted); }
+        .contact-modal .btn.qr i { color: #FFD700; }
+
+        .contact-modal .copy-hint {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .contact-modal .copy-hint.show { opacity: 1; }
+
+        .contact-modal .tip {
+            font-size: 0.75rem;
+            color: #888;
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.5;
+        }
+
+        .qr-container {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .qr-container.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .qr-box {
+            background: white;
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+        }
+
+        .qr-box img {
+            width: 180px;
+            height: 180px;
+        }
+
+        .qr-title {
+            margin: 12px 0 8px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .qr-hint {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 16px;
+        }
+
+        .close-qr {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="outer-container">
+        <div id="app-container">
+            <div class="header glass">
+                <div class="main-title">高潮管理日历</div>
+                <div class="sub-title">@XrayPapaGame</div>
+            </div>
+
+            <div class="content-area">
+                <div class="page active" id="welcomePage">
+                    <div class="welcome-container">
+                        <div class="welcome-bg"></div>
+                        <div class="transition-mask"></div>
+                        <div class="logo-container">
+                            <div class="logo-glow"></div>
+                            <div class="logo-text" id="logoText">XPG</div>
+                        </div>
+                        <div class="typing-container">
+                        </div>
+                        <div class="slogan-container">
+                            <div class="slogan" id="sloganText"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="projectPage">
+                    <h2 class="title-md"><i class="fas fa-tasks"></i> 项目管理</h2>
+                    <div id="projectCardContainer">
+                        <!-- 项目卡片将在这里动态生成 -->
+                    </div>
+                    <div class="project-selector" id="projectSelector">
+                        <div class="project-selector-header">
+                            <div class="project-selector-title">选择项目</div>
+                            <div class="project-selector-arrow"><i class="fas fa-chevron-down"></i></div>
+                        </div>
+                        <div class="project-selector-list">
+                            <!-- 项目列表将在这里动态生成 -->
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="createProjectBtn">
+                        <i class="fas fa-plus"></i> 新建高潮项目
+                    </button>
+                </div>
+
+                <div class="page" id="calendarPage">
+                    <div class="calendar-container">
+                        <div class="calendar-header glass">
+                            <button class="btn" id="prevMonthBtn"><i class="fas fa-chevron-left"></i></button>
+                            <h3 id="currentMonth" class="title-md">2025年11月</h3>
+                            <button class="btn" id="nextMonthBtn"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <div class="calendar-nav">
+                            <button class="btn btn-secondary calendar-nav-btn today" id="todayBtn"><i class="fas fa-calendar-day"></i>刷新</button>
+                            <button class="btn btn-restricted calendar-nav-btn restricted is-disabled" id="restrictedBtn">
+                                <i class="fas fa-ban"></i> 今日已禁欲
+                            </button>
+                            <button class="btn btn-highlight calendar-nav-btn highlight is-disabled" id="highlightBtn">
+                                <i class="fas fa-star"></i> 今日已高潮
+                            </button>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="profilePage">
+                    <div class="profile-header glass" id="profileHeader">
+                        <div id="registerForm">
+                            <h2 class="title-md"><i class="fas fa-user-plus"></i> 注册个人信息</h2>
+                            <div class="form-group">
+                                <label class="form-label" for="nickname">昵称</label>
+                                <input type="text" class="form-control" id="nickname" maxlength="20" placeholder="输入昵称（0-20字符）">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bio">个性签名</label>
+                                <textarea class="form-control" id="bio" rows="3" placeholder="输入个性签名"></textarea>
+                            </div>
+                            <button class="btn btn-primary btn-block" id="registerBtn">
+                                <i class="fas fa-check"></i> 注册
+                            </button>
+                        </div>
+                        <div id="profileInfo" style="display: none;">
+                            <div class="profile-avatar" id="profileAvatar">U</div>
+                            <div class="profile-name" id="profileName">用户</div>
+                            <div class="profile-bio" id="profileBio">个性签名</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-buttons">
+                        <div class="profile-btn" id="eternalBtn">
+                            <i class="fas fa-monument"></i>
+                            <span>永恒者丰碑</span>
+                        </div>
+                        <div class="profile-btn" id="editProfileBtn">
+                            <i class="fas fa-user-edit"></i>
+                            <span>修改个人注册信息</span>
+                        </div>
+                        <div class="profile-btn" id="ticketsBtn">
+                            <i class="fas fa-ticket-alt"></i>
+                            <span>高潮许可证明</span>
+                        </div>
+                        <div class="profile-btn" id="statsBtn">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>游戏结算证明</span>
+                        </div>
+                        <div class="profile-btn" id="dataBtn">
+                            <i class="fas fa-database"></i>
+                            <span>数据管理</span>
+                        </div>
+                        <div class="profile-btn" id="contactBtn">
+                            <i class="fas fa-comments"></i>
+                            <span>联系作者</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation glass">
+                <button class="nav-btn active" data-page="welcomePage">
+                    <i class="fas fa-home"></i>
+                    <span>首页</span>
+                </button>
+                <button class="nav-btn is-disabled" data-page="projectPage">
+                    <i class="fas fa-tasks"></i>
+                    <span>项目管理</span>
+                </button>
+                <button class="nav-btn is-disabled" data-page="calendarPage">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>高潮日历</span>
+                </button>
+                <button class="nav-btn" data-page="profilePage">
+                    <i class="fas fa-user"></i>
+                    <span>骚狗主页</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal glass">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">模态窗口标题</div>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+
+    <!-- 联系作者模态窗口 -->
+    <div class="qr-container" id="qrContainer">
+        <div class="qr-box">
+            <div id="qrTitle" class="qr-title"></div>
+            <img id="qrImage" src="" alt="QR Code">
+            <p class="qr-hint">长按图片扫描二维码</p>
+            <button class="close-qr" id="closeQrBtn">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        const appData = {
+            player: null,
+            projects: [],
+            currentDate: new Date(),
+            settings: {
+                darkMode: true
+            },
+            projectColors: [
+                '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', 
+                '#ff9ff3', '#54a0ff', '#5f27cd', '#ff9f43', '#10ac84'
+            ],
+            version: 2
+        };
+
+        const eternalList = [
+            "XrayPapa", "Kevin Zhao", "苏苏", "念念碎的小w", "Drive G", 
+            "TOeeta", "SevenFuF", "浔峰", "CX·1901", "小马爱人夫", 
+            "HL", "心安", "Pro DD", "慕白 Mubai", "lydia", 
+            "肖柏凌", "四色湖里的GGB", "CcarpeDiemmmm", "奇特OVO", "Galian", 
+            "Lsland", "被子同学", "Destin", "Hey野", "Tinaraly", 
+            "鸩方", "含光", "SEVEN Hu", "Elio", "山河", 
+            "月半", "李霄", "小宇", "Jace Carter", "陶黑黑", "Spohie",
+            "LanSlytherin"
+        ];
+
+        const slogans = [
+            "真正的快感，来自等待",
+            "掌控冲动的人，才配被快感选择",
+            "不确定，是在被约束，还是被拯救",
+            "延迟快感，是最高级的享受",
+            "你不是被剥夺，而是被磨炼",
+            "你的高潮，是我的私有财产",
+            "想高潮？先证明你的忠诚",
+            "今天的忍耐，是明天的奖赏",
+            "不是禁止，是进化的开始",
+            "命运已定，只待揭晓",
+            "每一次压抑，都是一次升级",
+            "一场欲望的预言",
+            "你的前列腺在乞求？忽略它，继续忍。",
+            "克制，是对自己的掌权",
+            "等待我的点头，像个好狗狗。",
+            "命运的骰子，早已掷出",
+            "你好像还没有被允许",
+            "真正的力量，是能在想要时停下",
+            "越晚抵达，越值得",
+            "高潮不是目标，是证明",
+            "自律值上升中，勿中断。",
+            "玩的是时间，赌的是耐心",
+            "系统提醒：欲望不是紧急任务",
+            "禁欲不是惩罚，是关卡",
+            "正在同步意志，请保持冷静",
+            "再涨大一点点，就要溢出来了，对吗？",
+            "系统已启动，请与欲望保持安全距离",
+            "命运程序运行中，请勿手动干预",
+            "龟头红肿？可爱，继续忽略。",
+            "快感被延迟，意志正在编译",
+            "时间是算法，欲望是变量",
+            "当前状态：人性波动稳定",
+            "高潮不是奖励，而是通过测试后的结果",
+            "别急，系统总会在正确的时刻放行",
+            "每一分克制，都是铺垫",
+            "当封印解除，快感重生",
+            "灵魂高潮，先于肉体释放。",
+            "放轻呼吸，继续等",
+            "不是每次等待都要完美",
+            "冲动并不丢人，它让你还像个人",
+            "一场与欲望的协议",
+            "你在学习，与自己和平共处，只是在借助工具而已",
+            "时间在教你温柔地控制自己",
+            "偶尔动摇，不代表失败",
+            "你依然在成长，只是节奏不同",
+            "系统已检测到人类冲动",
+            "数据重组中，请维持稳定心率",
+            "你不是机器，也不需要完美，或许，可以尝试偷偷违禁",
+            "当前任务：维持理性",
+            "开始喜欢这种慢慢被耗尽的过程",
+            "快感从来不是敌人，冲动才是",
+            "被推迟的快乐，更容易被珍惜",
+            "时间不会催促，也不会等待，享受当下",
+            "今天不释放，也没关系",
+            "明天也许会更适合",
+            "开始分不清，是服从，还是安心",
+            "你以为自己在等待许可，其实是在习惯等待",
+            "这不是游戏，而是一次行为实验",
+            "别讨好系统，它不讲情面，或许，可以尝试跪着祈求我",
+            "我不不禁止你的高潮，只是在观察你能忍多久",
+            "我控制系统，你控制自己——公平交易",
+            "我写下规则，你选择遵守或挣扎",
+
+        ];
+
+        const appContainer = document.getElementById('app-container');
+        const contentArea = document.querySelector('.content-area');
+        const pages = document.querySelectorAll('.page');
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalClose = document.getElementById('modalClose');
+
+        const welcomePage = document.getElementById('welcomePage');
+        const logoText = document.getElementById('logoText');
+        const typingContainer = document.querySelector('.typing-container');
+        const sloganText = document.getElementById('sloganText');
+        const transitionMask = document.querySelector('.transition-mask');
+
+        const projectPage = document.getElementById('projectPage');
+        const projectCardContainer = document.getElementById('projectCardContainer');
+        const projectSelector = document.getElementById('projectSelector');
+        const projectSelectorHeader = projectSelector.querySelector('.project-selector-header');
+        const projectSelectorArrow = projectSelector.querySelector('.project-selector-arrow');
+        const projectSelectorList = projectSelector.querySelector('.project-selector-list');
+        const createProjectBtn = document.getElementById('createProjectBtn');
+
+        const calendarPage = document.getElementById('calendarPage');
+        const currentMonth = document.getElementById('currentMonth');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        const todayBtn = document.getElementById('todayBtn');
+        const calendarGrid = document.getElementById('calendarGrid');
+        const restrictedBtn = document.getElementById('restrictedBtn');
+        const highlightBtn = document.getElementById('highlightBtn');
+
+        const profilePage = document.getElementById('profilePage');
+        const registerForm = document.getElementById('registerForm');
+        const profileInfo = document.getElementById('profileInfo');
+        const nicknameInput = document.getElementById('nickname');
+        const bioInput = document.getElementById('bio');
+        const registerBtn = document.getElementById('registerBtn');
+        const profileAvatar = document.getElementById('profileAvatar');
+        const profileName = document.getElementById('profileName');
+        const profileBio = document.getElementById('profileBio');
+        const eternalBtn = document.getElementById('eternalBtn');
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const ticketsBtn = document.getElementById('ticketsBtn');
+        const statsBtn = document.getElementById('statsBtn');
+        const dataBtn = document.getElementById('dataBtn');
+        const contactBtn = document.getElementById('contactBtn');
+
+        const qrContainer = document.getElementById('qrContainer');
+        const qrImage = document.getElementById('qrImage');
+        const qrTitle = document.getElementById('qrTitle');
+        const closeQrBtn = document.getElementById('closeQrBtn');
+
+        let homePlaying = false;
+        let homeAbort = false;
+        let currentSelectedProjectId = null;
+
+        // 数据验证函数
+        function validateProjectData(project) {
+            if (!project || typeof project !== 'object') return false;
+            
+            // 验证必要字段
+            const requiredFields = ['id', 'name', 'period', 'mode', 'startDate', 'endDate'];
+            for (let field of requiredFields) {
+                if (!project[field]) return false;
+            }
+            
+            // 验证日期
+            const startDate = new Date(project.startDate);
+            const endDate = new Date(project.endDate);
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return false;
+            
+            return true;
+        }
+
+        // 改进的分数计算
+        function getScoreByMode(mode, isHighlightDay, status) {
+            const scoreMap = {
+                easy: {
+                    highlight_correct: 5,
+                    highlight_restricted: 10,
+                    restricted_correct: 2,
+                    restricted_highlight: -5
+                },
+                normal: {
+                    highlight_correct: 10,
+                    highlight_restricted: 20,
+                    restricted_correct: 5,
+                    restricted_highlight: -20
+                },
+                hard: {
+                    highlight_correct: 10,
+                    highlight_restricted: 30,
+                    restricted_correct: 8,
+                    restricted_highlight: -40
+                }
+            };
+            
+            const action = isHighlightDay 
+                ? (status === 'highlight' ? 'highlight_correct' : 'highlight_restricted')
+                : (status === 'highlight' ? 'restricted_highlight' : 'restricted_correct');
+            
+            return scoreMap[mode][action] || 0;
+        }
+
+        function generateHighlightDays(period, mode, startDate) {
+            let highlightCount = calculateHighlightCount(period, mode);
+            
+            highlightCount = Math.min(highlightCount, period);
+            
+            const allDays = Array.from({length: period}, (_, i) => i);
+            
+            for (let i = allDays.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allDays[i], allDays[j]] = [allDays[j], allDays[i]];
+            }
+            
+            const selectedDays = allDays.slice(0, highlightCount);
+            
+            return selectedDays.map(dayOffset => {
+                const highlightDate = new Date(startDate);
+                highlightDate.setDate(highlightDate.getDate() + dayOffset);
+                return highlightDate;
+            });
+        }
+
+        // 计算高潮日数量
+        function calculateHighlightCount(period, mode) {
+            if (period === 7) {
+                if (mode === 'easy') return getRandomInt(1, 5);
+                else if (mode === 'normal') return getRandomInt(1, 3);
+                else if (mode === 'hard') return getRandomInt(0, 1);
+            } else if (period === 15) {
+                if (mode === 'easy') return getRandomInt(1, 10);
+                else if (mode === 'normal') return getRandomInt(1, 5);
+                else if (mode === 'hard') return getRandomInt(0, 3);
+            }
+            return 0;
+        }
+
+        function validateImportedData(data) {
+            if (!data || typeof data !== 'object') return false;
+            
+            if (data.version && data.version > appData.version) {
+                throw new Error('数据版本过高，请更新应用');
+            }
+            
+            if (!data.player || typeof data.player !== 'object') return false;
+            if (!Array.isArray(data.projects)) return false;
+            
+            if (!data.player.nickname || typeof data.player.nickname !== 'string') return false;
+            
+            return true;
+        }
+
+        function initApp() {
+            loadData();
+            checkRegistration();
+            checkEternalStatus();
+            setupEventListeners();
+            initWelcomeAnimation();
+            updateCalendar();
+            updateProjectDisplay();
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem('orgasmManagerData');
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    Object.assign(appData, parsedData);
+                    
+                    if (!Array.isArray(appData.projects)) {
+                        console.warn('projects数据格式错误，重置为空数组');
+                        appData.projects = [];
+                    } else {
+                        appData.projects = appData.projects.filter(project => {
+                            if (!validateProjectData(project)) return false;
+                            
+                            try {
+                                project.startDate = new Date(project.startDate);
+                                project.endDate = new Date(project.endDate);
+                                project.createTime = project.createTime ? new Date(project.createTime) : project.startDate;
+                                
+                                if (isNaN(project.startDate.getTime()) || isNaN(project.endDate.getTime())) {
+                                    console.warn('项目日期无效，跳过该项目');
+                                    return false;
+                                }
+                                
+                                if (!Array.isArray(project.highlightDays)) {
+                                    project.highlightDays = [];
+                                } else {
+                                    project.highlightDays = project.highlightDays.map(day => {
+                                        const date = new Date(day);
+                                        return isNaN(date.getTime()) ? null : date;
+                                    }).filter(day => day !== null);
+                                }
+                                
+                                project.id = project.id || Date.now().toString();
+                                project.name = project.name || '未命名项目';
+                                project.period = project.period || 7;
+                                project.mode = project.mode || 'normal';
+                                project.score = project.score || 0;
+                                project.status = project.status || 'waiting';
+                                project.color = project.color || appData.projectColors[appData.projects.indexOf(project) % appData.projectColors.length];
+                                
+                                return true;
+                            } catch (error) {
+                                console.warn('项目数据修复失败，跳过该项目:', error);
+                                return false;
+                            }
+                        });
+                    }
+                    
+                    if (typeof appData.player !== 'object' || appData.player === null) {
+                        appData.player = null;
+                    } else {
+                        appData.player.nickname = appData.player.nickname || '';
+                        appData.player.bio = appData.player.bio || '';
+                        appData.player.registerDate = new Date(appData.player.registerDate);
+                        if (isNaN(appData.player.registerDate.getTime())) {
+                            appData.player.registerDate = new Date();
+                        }
+                        appData.player.isEternal = appData.player.isEternal || false;
+                        appData.player.eternalGreeted = appData.player.eternalGreeted || false;
+                        appData.player.dailyStatus = appData.player.dailyStatus || {};
+                    }
+                    
+                    if (typeof appData.settings !== 'object' || appData.settings === null) {
+                        appData.settings = { darkMode: true };
+                    }
+                    
+                } catch (error) {
+                    console.error('加载数据失败:', error);
+                    appData.player = null;
+                    appData.projects = [];
+                    appData.settings = { darkMode: true };
+                }
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('orgasmManagerData', JSON.stringify(appData));
+        }
+
+        function checkRegistration() {
+            if (appData.player) {
+                registerForm.style.display = 'none';
+                profileInfo.style.display = 'block';
+                profileAvatar.textContent = appData.player.nickname.charAt(0).toUpperCase();
+                profileName.textContent = appData.player.nickname;
+                profileBio.textContent = appData.player.bio;
+                
+                logoText.textContent = appData.player.nickname;
+                
+                applyEternalPrivileges();
+                
+                document.querySelectorAll('.nav-btn[data-page="projectPage"], .nav-btn[data-page="calendarPage"]').forEach(btn => {
+                    btn.classList.remove('is-disabled');
+                });
+            } else {
+                registerForm.style.display = 'block';
+                profileInfo.style.display = 'none';
+                
+                logoText.textContent = "XPG";
+                
+                document.querySelectorAll('.nav-btn[data-page="projectPage"], .nav-btn[data-page="calendarPage"]').forEach(btn => {
+                    btn.classList.add('is-disabled');
+                });
+            }
+        }
+
+        function applyEternalPrivileges() {
+            if (!appData.player || !appData.player.isEternal) return;
+            
+            const profileHeader = document.getElementById('profileHeader');
+            if (profileHeader && !document.querySelector('.eternal-badge')) {
+                const eternalBadge = document.createElement('div');
+                eternalBadge.className = 'eternal-badge';
+                eternalBadge.textContent = '永恒者';
+                profileHeader.appendChild(eternalBadge);
+            }
+            
+            const profileName = document.getElementById('profileName');
+            if (profileName && !profileName.querySelector('.crown-icon')) {
+                profileName.classList.add('eternal-name');
+                const crownIcon = document.createElement('i');
+                crownIcon.className = 'fas fa-crown crown-icon';
+                profileName.appendChild(crownIcon);
+            }
+            
+            const profileAvatar = document.getElementById('profileAvatar');
+            if (profileAvatar) {
+                profileAvatar.classList.add('eternal-avatar');
+                
+                // 添加第三个脉冲元素
+                const pulse3 = document.createElement('div');
+                pulse3.className = 'pulse-3';
+                profileAvatar.appendChild(pulse3);
+            }
+        }
+
+        function checkEternalStatus() {
+            if (appData.player && eternalList.includes(appData.player.nickname)) {
+                if (!appData.player.isEternal) {
+                    appData.player.isEternal = true;
+                    saveData();
+                    showModal('永恒者欢迎', `<p>欢迎永恒者 ${appData.player.nickname}！感谢您对XrayPapa的支持！</p>`);
+                } else if (!appData.player.eternalGreeted) {
+                    showModal('永恒者欢迎', `<p>欢迎回来，永恒者 ${appData.player.nickname}！感谢您长久以来的信任与支持！</p>`);
+                    appData.player.eternalGreeted = true;
+                    saveData();
+                }
+            }
+        }
+
+        function setupEventListeners() {
+            navBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (btn.classList.contains('is-disabled')) {
+                        showModal('提示', '<p>请先注册个人信息以解锁此功能</p>');
+                        return;
+                    }
+                    
+                    const pageId = btn.getAttribute('data-page');
+                    switchPage(pageId);
+                    
+                    navBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+            
+            modalClose.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+            
+            createProjectBtn.addEventListener('click', showCreateProjectModal);
+            
+            prevMonthBtn.addEventListener('click', () => {
+                appData.currentDate.setMonth(appData.currentDate.getMonth() - 1);
+                updateCalendar();
+            });
+            
+            nextMonthBtn.addEventListener('click', () => {
+                appData.currentDate.setMonth(appData.currentDate.getMonth() + 1);
+                updateCalendar();
+            });
+            
+            todayBtn.addEventListener('click', () => {
+                appData.currentDate = new Date();
+                updateCalendar();
+            });
+            
+            restrictedBtn.addEventListener('click', () => markDayStatus('restricted'));
+            highlightBtn.addEventListener('click', () => markDayStatus('highlight'));
+            
+            registerBtn.addEventListener('click', registerUser);
+            eternalBtn.addEventListener('click', showEternalList);
+            editProfileBtn.addEventListener('click', showEditProfileModal);
+            ticketsBtn.addEventListener('click', showTickets);
+            statsBtn.addEventListener('click', showStats);
+            dataBtn.addEventListener('click', showDataOptions);
+            contactBtn.addEventListener('click', showContactModal);
+            
+            // 项目选择器事件
+            projectSelectorHeader.addEventListener('click', toggleProjectSelector);
+            document.addEventListener('click', (e) => {
+                if (!projectSelector.contains(e.target)) {
+                    projectSelectorHeader.classList.remove('active');
+                    projectSelectorArrow.classList.remove('active');
+                    projectSelectorList.classList.remove('active');
+                }
+            });
+            
+            // 二维码关闭事件
+            closeQrBtn.addEventListener('click', closeQR);
+            qrContainer.addEventListener('click', (e) => {
+                if (e.target === qrContainer) closeQR();
+            });
+        }
+
+        function switchPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            if (pageId === 'calendarPage') {
+                updateCalendar();
+            } else if (pageId === 'projectPage') {
+                // 切换到项目管理页面时，重置为默认显示的项目
+                currentSelectedProjectId = null;
+                updateProjectDisplay();
+            }
+        }
+
+        function toggleProjectSelector() {
+            projectSelectorHeader.classList.toggle('active');
+            projectSelectorArrow.classList.toggle('active');
+            projectSelectorList.classList.toggle('active');
+        }
+
+        function showModal(title, content) {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = content;
+            modalOverlay.classList.add('active');
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+        }
+
+        function showConfirmModal(title, content) {
+            return new Promise((resolve) => {
+                const modalContent = `
+                    ${content}
+                    <div class="modal-buttons">
+                        <button class="btn btn-primary" id="confirmBtn">确认</button>
+                        <button class="btn" id="cancelBtn">取消</button>
+                    </div>
+                `;
+                
+                showModal(title, modalContent);
+                
+                const confirmBtn = document.getElementById('confirmBtn');
+                const cancelBtn = document.getElementById('cancelBtn');
+                
+                if (confirmBtn && cancelBtn) {
+                    confirmBtn.addEventListener('click', () => {
+                        closeModal();
+                        resolve(true);
+                    }, { once: true });
+                    
+                    cancelBtn.addEventListener('click', () => {
+                        closeModal();
+                        resolve(false);
+                    }, { once: true });
+                } else {
+                    resolve(false);
+                }
+            });
+        }
+
+        function initWelcomeAnimation() {
+            if (homePlaying) return;
+            homePlaying = true;
+            
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            
+            async function runAnimation() {
+                while (!homeAbort) {
+                    typingContainer.innerHTML = `
+                        <div class="letter">X<span class="cursor"></span></div>
+                        <div class="letter">P<span class="cursor"></span></div>
+                    `;
+                    sloganText.classList.remove('show');
+                    
+                    for (let i = 0; i < 3; i++) {
+                        const letters = document.querySelectorAll('.letter');
+                        letters.forEach(letter => {
+                            letter.style.opacity = '0.2';
+                        });
+                        await sleep(80);
+                        letters.forEach(letter => {
+                            letter.style.opacity = '1';
+                        });
+                        await sleep(100 + Math.random() * 80);
+                    }
+                    
+                    const base = "XrayPapa";
+                    const letters = document.querySelectorAll('.letter');
+                    
+                    for (let i = 0; i < 4; i++) {
+                        letters[0].textContent = base.slice(0, i + 1);
+                        await sleep(160);
+                    }
+                    
+                    for (let i = 4; i < base.length; i++) {
+                        letters[1].textContent = base.slice(4, i + 1);
+                        await sleep(160);
+                    }
+                    
+                    document.querySelectorAll('.cursor').forEach(cursor => cursor.remove());
+                    
+                    const randomSlogan = slogans[Math.floor(Math.random() * slogans.length)];
+                    sloganText.textContent = randomSlogan;
+                    sloganText.classList.add('show');
+                    
+                    await sleep(5000);
+                    
+                    sloganText.classList.remove('show');
+                    await sleep(1000);
+                    
+                    typingContainer.innerHTML = '';
+                }
+                homePlaying = false;
+            }
+            
+            runAnimation();
+        }
+
+        function showCreateProjectModal() {
+            const hasActiveOrWaitingProject = appData.projects.some(project => {
+                const today = new Date();
+                return project.status === 'waiting' || project.status === 'active';
+            });
+            
+            if (hasActiveOrWaitingProject) {
+                showModal('提示', '<p>您已有项目正在进行或等待开始，请等待项目结束后再创建新项目。</p>');
+                return;
+            }
+            
+            const modalContent = `
+                <div class="form-group">
+                    <label class="form-label" for="projectName">项目名称</label>
+                    <input type="text" class="form-control" id="projectName" maxlength="20" placeholder="输入项目名称（0-20字符）">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="projectPeriod">项目周期</label>
+                    <select class="form-control" id="projectPeriod">
+                        <option value="7">7天</option>
+                        <option value="15">15天</option>
+                        <option value="30">30天</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="projectMode">模式</label>
+                    <select class="form-control" id="projectMode">
+                        <option value="easy">简单</option>
+                        <option value="normal">一般</option>
+                        <option value="hard">困难</option>
+                    </select>
+                </div>
+                <div id="rulesExplanationDynamic">
+                    <div class="rules-explanation">
+                        <h4>规则说明</h4>
+                        <p>请选择周期和模式查看详细规则说明。</p>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-primary" id="generateProjectBtn">
+                        <i class="fas fa-dice"></i> 跪求主人为骚狗分配日期
+                    </button>
+                </div>
+            `;
+            
+            showModal('XrayPapa批准新建项目', modalContent);
+            
+            const projectPeriod = document.getElementById('projectPeriod');
+            const projectMode = document.getElementById('projectMode');
+            const rulesExplanationDynamic = document.getElementById('rulesExplanationDynamic');
+            
+            function updateDynamicRules() {
+                const period = projectPeriod.value;
+                const mode = projectMode.value;
+                let explanation = '';
+                
+                if (period === '30') {
+                    if (mode === 'easy') {
+                        explanation = `
+                            <div class="rules-explanation" style="margin-top: 10px;">
+                                <h4>30天周期 - 简单模式规则</h4>
+                                <p>采用<strong>骰子飞行棋</strong>方式分配高潮日：</p>
+                                <ul>
+                                    <li>从周期第一天开始，每次投掷的点数决定前进天数</li>
+                                    <li>到达的位置即为高潮日</li>
+                                    <li>可以无限次投掷，直到超出周期范围</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else if (mode === 'normal') {
+                        explanation = `
+                            <div class="rules-explanation" style="margin-top: 10px;">
+                                <h4>30天周期 - 一般模式规则</h4>
+                                <p>采用<strong>分组骰子</strong>方式分配高潮日：</p>
+                                <ul>
+                                    <li>30天分为5组，每组6天</li>
+                                    <li>每组投掷一次骰子，点数决定该组哪一天允许高潮</li>
+                                </ul>
+                            </div>
+                        `;
+                    } else if (mode === 'hard') {
+                        explanation = `
+                            <div class="rules-explanation" style="margin-top: 10px;">
+                                <h4>30天周期 - 困难模式规则</h4>
+                                <p>采用<strong>一次性投掷</strong>方式分配高潮日：</p>
+                                <ul>
+                                    <li>一次性投掷骰子，点数决定高潮日总数</li>
+                                    <li>系统随机分配具体日期</li>
+                                </ul>
+                            </div>
+                        `;
+                    }
+                } else {
+                    let highlightRange = '';
+                    if (period === '7') {
+                        if (mode === 'easy') highlightRange = '1-5天';
+                        else if (mode === 'normal') highlightRange = '1-3天';
+                        else if (mode === 'hard') highlightRange = '0-1天';
+                    } else if (period === '15') {
+                        if (mode === 'easy') highlightRange = '1-10天';
+                        else if (mode === 'normal') highlightRange = '1-5天';
+                        else if (mode === 'hard') highlightRange = '0-3天';
+                    }
+                    
+                    explanation = `
+                        <div class="rules-explanation" style="margin-top: 10px;">
+                            <h4>${period}天周期 - ${getModeText(mode)}模式规则</h4>
+                            <p>系统将随机分配<strong>${highlightRange}</strong>高潮日，其余日期为禁欲日。</p>
+                            <p>请在高潮日尽情释放，在禁欲日严格克制。</p>
+                        </div>
+                    `;
+                }
+                
+                rulesExplanationDynamic.innerHTML = explanation;
+            }
+            
+            projectPeriod.addEventListener('change', updateDynamicRules);
+            projectMode.addEventListener('change', updateDynamicRules);
+            updateDynamicRules();
+            
+            const generateProjectBtn = document.getElementById('generateProjectBtn');
+            if (generateProjectBtn) {
+                generateProjectBtn.addEventListener('click', generateProject);
+            }
+        }
+
+        function generateProject() {
+            const projectNameInput = document.getElementById('projectName');
+            const projectPeriodInput = document.getElementById('projectPeriod');
+            const projectModeInput = document.getElementById('projectMode');
+            
+            if (!projectNameInput || !projectPeriodInput || !projectModeInput) {
+                showModal('错误', '<p>表单元素未找到</p>');
+                return;
+            }
+            
+            const projectName = projectNameInput.value;
+            const projectPeriod = parseInt(projectPeriodInput.value);
+            const projectMode = projectModeInput.value;
+            
+            if (!projectName.trim()) {
+                showModal('提示', '<p>请输入项目名称</p>');
+                return;
+            }
+            
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() + 1);
+            startDate.setHours(0, 0, 0, 0);
+            
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + projectPeriod - 1);
+            endDate.setHours(23, 59, 59, 999);
+            
+            let highlightDays = [];
+            
+            if (projectPeriod === 30) {
+                closeModal();
+                showDiceModal(projectName, startDate, endDate, projectMode);
+                return;
+            } else {
+                highlightDays = generateHighlightDays(projectPeriod, projectMode, startDate);
+            }
+            
+            const project = {
+                id: Date.now().toString(),
+                name: projectName,
+                period: projectPeriod,
+                mode: projectMode,
+                startDate: startDate,
+                endDate: endDate,
+                createTime: new Date(),
+                highlightDays: highlightDays,
+                score: 0,
+                status: 'waiting',
+                color: appData.projectColors[appData.projects.length % appData.projectColors.length]
+            };
+            
+            appData.projects.push(project);
+            saveData();
+            updateProjectDisplay();
+            closeModal();
+            
+            showModal('项目创建成功', `<p>项目 "${projectName}" 已成功创建！高潮日已分配。</p>`);
+        }
+
+        function showDiceModal(projectName, startDate, endDate, mode) {
+            let diceResult = 0;
+            let highlightDays = [];
+            let currentStep = 0;
+            let totalSteps = 0;
+            let lastHighlightDay = null;
+            let projectCreated = false;
+            
+            if (mode === 'easy') {
+                totalSteps = Infinity;
+            } else if (mode === 'normal') {
+                totalSteps = 5;
+            } else if (mode === 'hard') {
+                totalSteps = 1;
+            }
+            
+            let modalContent = `
+                <div class="rules-explanation">
+                    <h4>骰子规则说明</h4>
+                    <p>根据您选择的模式，骰子分配方式如下：</p>
+                    <ul>
+                        <li><strong>简单模式</strong>：飞行棋方式，从周期第一天开始，每次投掷的点数决定前进天数，确定高潮日位置</li>
+                        <li><strong>一般模式</strong>：分组方式，30天分为5组（每组6天），每组投掷一次，点数决定该组哪一天允许高潮</li>
+                        <li><strong>困难模式</strong>：一次性投掷，点数决定高潮日总数，系统随机分配具体日期</li>
+                    </ul>
+                    <p>当骰子结果超出周期范围时，分配结束，项目正式生成。</p>
+                </div>
+                <div class="dice-container">
+                    <div class="dice" id="diceElement">?</div>
+                    <div class="dice-result" id="diceResult">点击开始投掷</div>
+                    <div class="modal-buttons">
+                        <button class="btn btn-primary" id="rollDiceBtn">
+                            <i class="fas fa-dice"></i> 开始投掷
+                        </button>
+                    </div>
+                </div>
+                <div id="diceProgress"></div>
+            `;
+            
+            showModal('分配高潮日', modalContent);
+            
+            const diceElement = document.getElementById('diceElement');
+            const diceResultElement = document.getElementById('diceResult');
+            const rollDiceBtn = document.getElementById('rollDiceBtn');
+            const diceProgress = document.getElementById('diceProgress');
+            
+            if (!diceElement || !diceResultElement || !rollDiceBtn || !diceProgress) {
+                closeModal();
+                return;
+            }
+            
+            rollDiceBtn.addEventListener('click', () => {
+                if (projectCreated) return;
+                
+                if (currentStep >= totalSteps && mode !== 'easy') return;
+                
+                diceElement.classList.add('is-rolling');
+                rollDiceBtn.classList.add('is-disabled');
+                
+                setTimeout(() => {
+                    diceResult = getRandomInt(1, 6);
+                    diceElement.textContent = diceResult;
+                    diceElement.classList.remove('is-rolling');
+                    
+                    if (mode === 'easy') {
+                        if (highlightDays.length === 0) {
+                            const firstDay = new Date(startDate);
+                            firstDay.setDate(firstDay.getDate() + diceResult - 1);
+                            highlightDays.push(firstDay);
+                            lastHighlightDay = firstDay;
+                            diceResultElement.textContent = `第一个高潮日：${formatDate(firstDay)}`;
+                        } else {
+                            const nextDay = new Date(lastHighlightDay);
+                            nextDay.setDate(nextDay.getDate() + diceResult);
+                            
+                            if (nextDay <= endDate) {
+                                highlightDays.push(nextDay);
+                                lastHighlightDay = nextDay;
+                                diceResultElement.textContent = `下一个高潮日：${formatDate(nextDay)}`;
+                                rollDiceBtn.textContent = '继续投掷';
+                            } else {
+                                diceResultElement.textContent = `高潮日分配完成！共 ${highlightDays.length} 天`;
+                                rollDiceBtn.textContent = '完成';
+                                
+                                projectCreated = true;
+                                createProjectWithHighlightDays(projectName, 30, mode, startDate, endDate, highlightDays);
+                                return;
+                            }
+                        }
+                        
+                        rollDiceBtn.classList.remove('is-disabled');
+                    } else if (mode === 'normal') {
+                        const groupSize = 6;
+                        const groupStart = currentStep * groupSize;
+                        
+                        if (diceResult <= groupSize) {
+                            const highlightDay = new Date(startDate);
+                            highlightDay.setDate(highlightDay.getDate() + groupStart + diceResult - 1);
+                            highlightDays.push(highlightDay);
+                            diceResultElement.textContent = `第 ${currentStep + 1} 组高潮日：${formatDate(highlightDay)}`;
+                        } else {
+                            diceResultElement.textContent = `第 ${currentStep + 1} 组没有高潮日`;
+                        }
+                        
+                        currentStep++;
+                        
+                        if (currentStep >= totalSteps) {
+                            diceResultElement.textContent = `高潮日分配完成！共 ${highlightDays.length} 天`;
+                            rollDiceBtn.textContent = '完成';
+                            
+                            projectCreated = true;
+                            createProjectWithHighlightDays(projectName, 30, mode, startDate, endDate, highlightDays);
+                        } else {
+                            rollDiceBtn.textContent = `投掷第 ${currentStep + 1} 组`;
+                            rollDiceBtn.classList.remove('is-disabled');
+                        }
+                    } else if (mode === 'hard') {
+                        const highlightCount = diceResult;
+                        
+                        for (let i = 0; i < highlightCount; i++) {
+                            const dayOffset = getRandomInt(0, 29);
+                            const highlightDate = new Date(startDate);
+                            highlightDate.setDate(highlightDate.getDate() + dayOffset);
+                            
+                            highlightDays.push(highlightDate);
+                        }
+                        
+                        const uniqueDays = [...new Set(highlightDays.map(d => d.getTime()))].map(t => new Date(t));
+                        diceResultElement.textContent = `高潮日分配完成！点数 ${diceResult}，实际 ${uniqueDays.length} 天`;
+                        rollDiceBtn.textContent = '完成';
+                        currentStep = totalSteps;
+                        
+                        projectCreated = true;
+                        createProjectWithHighlightDays(projectName, 30, mode, startDate, endDate, uniqueDays);
+                    }
+                    
+                    updateDiceProgress(currentStep, totalSteps, diceProgress, mode, highlightDays.length);
+                    
+                    if (mode !== 'easy') {
+                        rollDiceBtn.classList.remove('is-disabled');
+                    }
+                }, 1000);
+            });
+        }
+
+        function updateDiceProgress(current, total, container, mode, highlightCount) {
+            if (mode === 'easy') {
+                container.innerHTML = `<p>已分配: ${highlightCount} 天 | 继续投掷骰子添加高潮日</p>`;
+            } else {
+                container.innerHTML = `<p>进度: ${current}/${total} | 已分配: ${highlightCount} 天</p>`;
+            }
+        }
+
+        function createProjectWithHighlightDays(name, period, mode, startDate, endDate, highlightDays) {
+            const existingProject = appData.projects.find(p => 
+                p.name === name && 
+                p.period === period && 
+                p.mode === mode &&
+                p.startDate.getTime() === startDate.getTime()
+            );
+            
+            if (existingProject) {
+                console.log('项目已存在，跳过创建');
+                return;
+            }
+            
+            const project = {
+                id: Date.now().toString(),
+                name: name,
+                period: period,
+                mode: mode,
+                startDate: startDate,
+                endDate: endDate,
+                createTime: new Date(),
+                highlightDays: highlightDays,
+                score: 0,
+                status: 'waiting',
+                color: appData.projectColors[appData.projects.length % appData.projectColors.length]
+            };
+            
+            appData.projects.push(project);
+            saveData();
+            updateProjectDisplay();
+            
+            const rollDiceBtn = document.getElementById('rollDiceBtn');
+            if (rollDiceBtn) {
+                rollDiceBtn.addEventListener('click', closeModal, { once: true });
+            } else {
+                setTimeout(closeModal, 2000);
+            }
+        }
+
+        // 更新项目显示（卡片和下拉列表）
+        function updateProjectDisplay() {
+            updateProjectCards();
+            updateProjectSelector();
+        }
+
+        // 更新项目卡片显示
+        function updateProjectCards() {
+            projectCardContainer.innerHTML = '';
+            
+            if (appData.projects.length === 0) {
+                projectCardContainer.innerHTML = '<p style="text-align: center; padding: 20px; color: var(--text-secondary);">暂无项目</p>';
+                return;
+            }
+            
+            // 获取当前选中的项目，如果没有则获取默认项目
+            let selectedProject = null;
+            if (currentSelectedProjectId) {
+                selectedProject = appData.projects.find(p => p.id === currentSelectedProjectId);
+            }
+            
+            if (!selectedProject) {
+                selectedProject = getDefaultProject();
+            }
+            
+            if (selectedProject) {
+                renderProjectCard(selectedProject);
+                currentSelectedProjectId = selectedProject.id;
+            }
+        }
+
+        // 获取默认显示的项目
+        function getDefaultProject() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // 首先查找进行中的项目
+            let activeProject = appData.projects.find(project => {
+                updateProjectStatus(project, today);
+                return project.status === 'active';
+            });
+            
+            if (activeProject) return activeProject;
+            
+            // 然后查找等待开始的项目
+            let waitingProject = appData.projects.find(project => {
+                updateProjectStatus(project, today);
+                return project.status === 'waiting';
+            });
+            
+            if (waitingProject) return waitingProject;
+            
+            // 最后查找最近完成的项目
+            let completedProjects = appData.projects.filter(project => {
+                updateProjectStatus(project, today);
+                return project.status === 'completed';
+            });
+            
+            if (completedProjects.length > 0) {
+                // 按结束日期倒序排列，取最近完成的项目
+                completedProjects.sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
+                return completedProjects[0];
+            }
+            
+            return null;
+        }
+
+        // 更新项目状态
+        function updateProjectStatus(project, today) {
+            if (today < project.startDate) {
+                project.status = 'waiting';
+            } else if (today > project.endDate) {
+                project.status = 'completed';
+            } else {
+                project.status = 'active';
+            }
+        }
+
+        // 渲染项目卡片
+        function renderProjectCard(project) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            updateProjectStatus(project, today);
+            
+            // 计算剩余天数和已过天数
+            let remainingDays = 0;
+            let passedDays = 0;
+            
+            if (project.status === 'waiting') {
+                remainingDays = Math.ceil((project.startDate - today) / (1000 * 60 * 60 * 24));
+                passedDays = 0;
+            } else if (project.status === 'active') {
+                remainingDays = Math.ceil((project.endDate - today) / (1000 * 60 * 60 * 24));
+                passedDays = Math.ceil((today - project.startDate) / (1000 * 60 * 60 * 24));
+            } else if (project.status === 'completed') {
+                remainingDays = 0;
+                passedDays = project.period;
+            }
+            
+            // 获取项目编号
+            const projectNumber = getProjectNumber(project.id);
+            
+            const projectCard = document.createElement('div');
+            projectCard.className = `project-ticket`;
+            projectCard.setAttribute('data-status', project.status);
+            
+            projectCard.innerHTML = `
+                <div class="content-wrapper">
+                    <div class="ticket-title">
+                        <h3>${project.name}</h3>
+                        <button class="delete-btn" title="删除项目">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+
+                    <div class="info-pair">
+                        <div class="info-left">
+                            <span>周期：${project.period}天</span>
+                            <span>难度：${getModeText(project.mode)}</span>
+                            <span>高潮：${project.highlightDays.length} 天</span>
+                        </div>
+                        <div class="info-right">
+                            <span>#${projectNumber.toString().padStart(3, '0')}</span>
+                            <span>开始：${formatDateShort(project.startDate)}</span>
+                            <span>终止：${formatDateShort(project.endDate)}</span>
+                        </div>
+                    </div>
+
+                    <div class="ticket-body">
+                        <div class="data-grid">
+                            <div class="data-item">
+                                <div class="data-label">剩余</div>
+                                <div class="data-value">${remainingDays} <small>天</small></div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">已过</div>
+                                <div class="data-value">${passedDays} <small>天</small></div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">状态</div>
+                                <div class="data-value">${getStatusText(project.status)}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tear-line">
+                        <div class="notch left"></div>
+                        <div class="dash"></div>
+                        <div class="notch right"></div>
+                    </div>
+
+                    <div class="ticket-footer">
+                        <div class="auth-qr-row">
+                            <div class="auth-info">
+                                <div class="auth-item">
+                                    <div class="auth-label">项目批准人</div>
+                                    <div class="auth-value">XrayPapa</div>
+                                </div>
+                                <div class="auth-item">
+                                    <div class="auth-label">项目执行人</div>
+                                    <div class="auth-value">${appData.player ? appData.player.nickname : '未注册用户'}${appData.player && appData.player.isEternal ? ' <i class="fas fa-crown" style="color: var(--eternal-gold);"></i>' : ''}</div>
+                                </div>
+                            </div>
+
+                            <div class="qrcode-container">
+                                <div class="qrcode">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://t.me/XrayPapa" alt="Telegram QR">
+                                </div>
+                                <div class="qrcode-hint">扫描关注频道</div>
+                            </div>
+                        </div>
+
+                        <div class="score-row">
+                            <span class="score-label">项目实时分数</span>
+                            <span class="score-value">${project.score}</span>
+                        </div>
+                    </div>
+
+                    <div class="status-stamp">XPG</div>
+                </div>
+            `;
+            
+            projectCardContainer.appendChild(projectCard);
+            
+            // 添加删除按钮事件
+            const deleteBtn = projectCard.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', () => deleteProject(project));
+        }
+
+        // 更新项目选择器
+        function updateProjectSelector() {
+            projectSelectorList.innerHTML = '';
+            
+            if (appData.projects.length === 0) {
+                projectSelectorHeader.style.display = 'none';
+                return;
+            }
+            
+            projectSelectorHeader.style.display = 'flex';
+            
+            // 对项目进行排序
+            const sortedProjects = [...appData.projects].sort((a, b) => {
+                // 首先按状态排序：进行中 > 等待开始 > 已完成
+                const statusOrder = { active: 1, waiting: 2, completed: 3 };
+                if (statusOrder[a.status] !== statusOrder[b.status]) {
+                    return statusOrder[a.status] - statusOrder[b.status];
+                }
+                
+                // 然后按开始日期排序
+                return new Date(a.startDate) - new Date(b.startDate);
+            });
+            
+            sortedProjects.forEach(project => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                updateProjectStatus(project, today);
+                
+                const projectItem = document.createElement('div');
+                projectItem.className = `project-selector-item ${project.id === currentSelectedProjectId ? 'active' : ''}`;
+                projectItem.setAttribute('data-project-id', project.id);
+                
+                const projectNumber = getProjectNumber(project.id);
+                
+                projectItem.innerHTML = `
+                    <div class="project-selector-number">#${projectNumber.toString().padStart(3, '0')}</div>
+                    <div class="project-selector-name">${project.name}</div>
+                    <div class="project-selector-status ${project.status}">${getStatusText(project.status)}</div>
+                `;
+                
+                projectItem.addEventListener('click', () => {
+                    currentSelectedProjectId = project.id;
+                    updateProjectCards();
+                    toggleProjectSelector();
+                    
+                    // 更新选择器中的活动项
+                    document.querySelectorAll('.project-selector-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    projectItem.classList.add('active');
+                });
+                
+                projectSelectorList.appendChild(projectItem);
+            });
+        }
+
+        // 获取项目编号
+        function getProjectNumber(projectId) {
+            // 对项目按创建时间排序
+            const sortedProjects = [...appData.projects].sort((a, b) => {
+                return new Date(a.createTime) - new Date(b.createTime);
+            });
+            
+            // 查找项目在排序列表中的索引
+            const index = sortedProjects.findIndex(p => p.id === projectId);
+            return index + 1; // 编号从1开始
+        }
+
+        function deleteProject(project) {
+            showConfirmModal('删除项目', `<p>确定要删除项目 "${project.name}" 吗？此操作不可逆。</p>`)
+                .then(confirmed => {
+                    if (confirmed) {
+                        appData.projects = appData.projects.filter(p => p.id !== project.id);
+                        saveData();
+                        
+                        // 重置当前选中的项目
+                        currentSelectedProjectId = null;
+                        
+                        updateProjectDisplay();
+                        updateCalendar();
+                    }
+                });
+        }
+
+        function updateCalendar() {
+            const year = appData.currentDate.getFullYear();
+            const month = appData.currentDate.getMonth();
+            
+            currentMonth.textContent = `${year}年${month + 1}月`;
+            
+            calendarGrid.innerHTML = '';
+            
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            weekdays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day-header glass';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            });
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            const firstDayOfWeek = firstDay.getDay();
+            
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendarGrid.appendChild(emptyDay);
+            }
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day glass';
+                dayElement.textContent = day;
+                
+                if (date.getTime() === today.getTime()) {
+                    // 根据用户是否为永恒者设置不同的样式
+                    if (appData.player && appData.player.isEternal) {
+                        dayElement.classList.add('today', 'eternal');
+                    } else {
+                        dayElement.classList.add('today');
+                    }
+                    
+                    updateStatusButtons(date);
+                }
+                
+                markProjectDates(date, dayElement);
+                
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        function markProjectDates(date, dayElement) {
+            const dateStr = formatDate(date);
+            let hasHighlight = false;
+            let hasRestricted = false;
+            const markers = [];
+            
+            appData.projects.forEach(project => {
+                if (date >= project.startDate && date <= project.endDate) {
+                    const colorBar = document.createElement('div');
+                    colorBar.className = 'project-color-bar';
+                    colorBar.style.backgroundColor = project.color;
+                    dayElement.appendChild(colorBar);
+                    
+                    const isHighlight = project.highlightDays.some(highlightDay => 
+                        highlightDay.getTime() === date.getTime()
+                    );
+                    
+                    if (isHighlight) {
+                        hasHighlight = true;
+                        markers.push('highlight');
+                        
+                        const highlightText = document.createElement('div');
+                        highlightText.className = 'day-status-text highlight';
+                        highlightText.textContent = '射';
+                        dayElement.appendChild(highlightText);
+                    } else {
+                        hasRestricted = true;
+                        markers.push('restricted');
+                        
+                        const restrictedText = document.createElement('div');
+                        restrictedText.className = 'day-status-text restricted';
+                        restrictedText.textContent = '禁';
+                        dayElement.appendChild(restrictedText);
+                    }
+                }
+            });
+            
+            if (hasHighlight) {
+                dayElement.classList.add('highlight');
+            }
+            if (hasRestricted) {
+                dayElement.classList.add('restricted');
+            }
+            
+            if (markers.length > 0) {
+                const markersContainer = document.createElement('div');
+                markersContainer.className = 'day-markers';
+                
+                markers.forEach(marker => {
+                    const markerElement = document.createElement('div');
+                    markerElement.className = `day-marker ${marker}`;
+                    markersContainer.appendChild(markerElement);
+                });
+                
+                dayElement.appendChild(markersContainer);
+            }
+        }
+
+        function updateStatusButtons(date) {
+            const dateStr = formatDate(date);
+            let isHighlightDay = false;
+            let isRestrictedDay = false;
+            
+            appData.projects.forEach(project => {
+                if (date >= project.startDate && date <= project.endDate) {
+                    const isHighlight = project.highlightDays.some(highlightDay => 
+                        highlightDay.getTime() === date.getTime()
+                    );
+                    
+                    if (isHighlight) {
+                        isHighlightDay = true;
+                    } else {
+                        isRestrictedDay = true;
+                    }
+                }
+            });
+            
+            const isAlreadyMarked = appData.player && appData.player.dailyStatus && appData.player.dailyStatus[dateStr];
+            
+            if ((isHighlightDay || isRestrictedDay) && !isAlreadyMarked) {
+                restrictedBtn.classList.remove('is-disabled');
+                highlightBtn.classList.remove('is-disabled');
+            } else {
+                restrictedBtn.classList.add('is-disabled');
+                highlightBtn.classList.add('is-disabled');
+            }
+            
+            if (isAlreadyMarked) {
+                restrictedBtn.title = "今天的状态已经标记过了";
+                highlightBtn.title = "今天的状态已经标记过了";
+            } else if (isHighlightDay) {
+                restrictedBtn.title = "今天是高潮日，选择禁欲会获得额外加分";
+                highlightBtn.title = "今天是高潮日，选择高潮会正常加分";
+            } else if (isRestrictedDay) {
+                restrictedBtn.title = "今天是禁欲日，选择禁欲会正常加分";
+                highlightBtn.title = "今天是禁欲日，选择高潮会扣分";
+            } else {
+                restrictedBtn.title = "今天没有项目活动";
+                highlightBtn.title = "今天没有项目活动";
+            }
+        }
+
+        function markDayStatus(status) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const dateStr = formatDate(today);
+            
+            if (!appData.player) {
+                showModal('提示', '<p>请先注册个人信息</p>');
+                return;
+            }
+            
+            if (!appData.player.dailyStatus) {
+                appData.player.dailyStatus = {};
+            }
+            
+            if (appData.player.dailyStatus[dateStr]) {
+                showModal('提示', '<p>今天的状态已经标记过了。</p>');
+                return;
+            }
+            
+            appData.player.dailyStatus[dateStr] = status;
+            
+            updateProjectScores(today, status);
+            
+            restrictedBtn.classList.add('is-disabled');
+            highlightBtn.classList.add('is-disabled');
+            
+            saveData();
+            
+            showModal('状态更新', `<p>已标记今天为${status === 'highlight' ? '高潮' : '禁欲'}日。</p>`);
+        }
+
+        function updateProjectScores(date, status) {
+            appData.projects.forEach(project => {
+                if (date >= project.startDate && date <= project.endDate) {
+                    // 确保分数有初始值
+                    if (typeof project.score !== 'number' || isNaN(project.score)) {
+                        project.score = 0;
+                    }
+                    
+                    const isHighlightDay = project.highlightDays.some(highlightDay => 
+                        highlightDay.getTime() === date.getTime()
+                    );
+                    
+                    let scoreChange = getScoreByMode(project.mode, isHighlightDay, status);
+                    project.score = Math.min(100, Math.max(0, project.score + scoreChange));
+                }
+            });
+        }
+
+        function registerUser() {
+            const nickname = nicknameInput.value.trim();
+            const bio = bioInput.value.trim();
+            
+            if (!nickname) {
+                showModal('提示', '<p>请输入昵称</p>');
+                return;
+            }
+            
+            if (appData.player) {
+                showConfirmModal('确认覆盖', '<p>已存在用户信息，是否覆盖？</p>')
+                    .then(confirmed => {
+                        if (confirmed) {
+                            appData.player = {
+                                nickname: nickname,
+                                bio: bio,
+                                registerDate: new Date(),
+                                isEternal: eternalList.includes(nickname),
+                                eternalGreeted: false,
+                                dailyStatus: appData.player.dailyStatus || {}
+                            };
+                            
+                            saveData();
+                            checkRegistration();
+                            checkEternalStatus();
+                            
+                            showModal('注册成功', `<p>用户信息已更新！欢迎 ${nickname}！</p>`);
+                        }
+                    });
+            } else {
+                appData.player = {
+                    nickname: nickname,
+                    bio: bio,
+                    registerDate: new Date(),
+                    isEternal: eternalList.includes(nickname),
+                    eternalGreeted: false,
+                    dailyStatus: {}
+                };
+                
+                saveData();
+                checkRegistration();
+                checkEternalStatus();
+                
+                showModal('注册成功', `<p>欢迎 ${nickname}！</p>`);
+            }
+        }
+
+        function showEditProfileModal() {
+            if (!appData.player) {
+                showModal('提示', '<p>请先注册个人信息</p>');
+                return;
+            }
+            
+            const modalContent = `
+                <div class="form-group">
+                    <label class="form-label" for="editNickname">昵称</label>
+                    <input type="text" class="form-control" id="editNickname" maxlength="20" value="${appData.player.nickname}" placeholder="输入昵称（0-20字符）">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="editBio">个性签名</label>
+                    <textarea class="form-control" id="editBio" rows="3" placeholder="输入个性签名">${appData.player.bio}</textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-primary" id="saveProfileBtn">
+                        <i class="fas fa-check"></i> 保存修改
+                    </button>
+                </div>
+            `;
+            
+            showModal('修改个人信息', modalContent);
+            
+            const saveProfileBtn = document.getElementById('saveProfileBtn');
+            if (saveProfileBtn) {
+                saveProfileBtn.addEventListener('click', saveProfileChanges);
+            }
+        }
+
+        function saveProfileChanges() {
+            const editNickname = document.getElementById('editNickname');
+            const editBio = document.getElementById('editBio');
+            
+            if (!editNickname || !editBio) {
+                showModal('错误', '<p>表单元素未找到</p>');
+                return;
+            }
+            
+            const nickname = editNickname.value.trim();
+            const bio = editBio.value.trim();
+            
+            if (!nickname) {
+                showModal('提示', '<p>请输入昵称</p>');
+                return;
+            }
+            
+            appData.player.nickname = nickname;
+            appData.player.bio = bio;
+            
+            const wasEternal = appData.player.isEternal;
+            appData.player.isEternal = eternalList.includes(nickname);
+            
+            if (wasEternal !== appData.player.isEternal) {
+                appData.player.eternalGreeted = false;
+            }
+            
+            saveData();
+            checkRegistration();
+            checkEternalStatus();
+            
+            closeModal();
+            showModal('修改成功', '<p>个人信息已成功更新！</p>');
+        }
+
+        function showEternalList() {
+            let listHTML = '<div class="eternal-list">';
+            eternalList.forEach(name => {
+                listHTML += `<div class="eternal-item">${name}</div>`;
+            });
+            listHTML += '</div>';
+            listHTML += '<p style="margin-top: 15px; text-align: center; font-style: italic;">永恒者丰碑记录对XrayPapa赏赞的玩家信息，感谢各位长久以来的信任和支持！</p>';
+            
+            showModal('永恒者丰碑', listHTML);
+        }
+
+        function showTickets() {
+            let ticketsHTML = '<h3>高潮许可证明</h3>';
+            
+            if (!appData.player || appData.projects.length === 0) {
+                ticketsHTML += '<p>暂无高潮许可证明</p>';
+                showModal('高潮许可证明', ticketsHTML);
+                return;
+            }
+            
+            const allTickets = [];
+            appData.projects.forEach(project => {
+                project.highlightDays.forEach(day => {
+                    allTickets.push({
+                        projectName: project.name,
+                        date: day,
+                        issueDate: project.createTime || project.startDate,
+                        isExpired: day < new Date()
+                    });
+                });
+            });
+            
+            const now = new Date();
+            const activeTickets = allTickets.filter(t => !t.isExpired).sort((a, b) => a.date - b.date);
+            const expiredTickets = allTickets.filter(t => t.isExpired).sort((a, b) => b.date - a.date);
+            
+            if (activeTickets.length > 0) {
+                ticketsHTML += '<h4>待使用</h4>';
+                activeTickets.forEach(ticket => {
+                    ticketsHTML += createTicketHTML(ticket);
+                });
+            }
+            
+            if (expiredTickets.length > 0) {
+                ticketsHTML += '<h4>已失效</h4>';
+                expiredTickets.forEach(ticket => {
+                    ticketsHTML += createTicketHTML(ticket);
+                });
+            }
+            
+            showModal('高潮许可证明', ticketsHTML);
+        }
+
+        function createTicketHTML(ticket) {
+            const isEternal = appData.player && appData.player.isEternal;
+            
+            return `
+                <div class="ticket ${ticket.isExpired ? 'is-expired' : ''}">
+                    ${isEternal ? '<div class="eternal-stamp">永恒者</div>' : ''}
+                    <div class="ticket-header">一次性高潮许可证明</div>
+                    <div class="ticket-info">
+                        <div><span class="ticket-label">被批准人:</span> <span class="ticket-value">${appData.player.nickname}${isEternal ? ' <i class="fas fa-crown" style="color: var(--eternal-gold);"></i>' : ''}</span></div>
+                        <div><span class="ticket-label">批准人:</span> <span class="ticket-value">XrayPapa</span></div>
+                        <div><span class="ticket-label">使用时间:</span> <span class="ticket-value">${formatDate(ticket.date)}</span></div>
+                        <div><span class="ticket-label">签发时间:</span> <span class="ticket-value">${formatDateTime(ticket.issueDate)}</span></div>
+                        <div><span class="ticket-label">状态:</span> <span class="ticket-value">${ticket.isExpired ? '已失效' : '待使用'}</span></div>
+                        <div><span class="ticket-label">项目:</span> <span class="ticket-value">${ticket.projectName}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showStats() {
+            try {
+                if (!appData.player) {
+                    showModal('游戏结算证明', '<p>请先注册个人信息</p>');
+                    return;
+                }
+                
+                if (!Array.isArray(appData.projects)) {
+                    appData.projects = [];
+                }
+                
+                const totalProjects = appData.projects.length;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                let totalDays = 0;
+                let totalHighlightDays = 0;
+                let totalRestrictedDays = 0;
+                let totalScore = 0;
+                let maxScore = 0;
+                let minScore = totalProjects > 0 ? Infinity : 0;
+                
+                appData.projects.forEach(project => {
+                    let projectDays = 0;
+                    const startTime = project.startDate.getTime();
+                    const endTime = project.endDate.getTime();
+                    
+                    if (isNaN(startTime) || isNaN(endTime)) return;
+                    
+                    if (today > project.endDate) {
+                        projectDays = project.period || 0;
+                    } else if (today >= project.startDate) {
+                        const timeDiff = today.getTime() - startTime;
+                        projectDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+                    }
+                    
+                    totalDays += projectDays;
+                    
+                    const highlightDaysInPeriod = (project.highlightDays || []).filter(day => {
+                        const highlightTime = day.getTime();
+                        if (isNaN(highlightTime)) return false;
+                        return highlightTime <= today.getTime();
+                    }).length;
+                    
+                    totalHighlightDays += highlightDaysInPeriod;
+                    totalRestrictedDays += projectDays - highlightDaysInPeriod;
+                    
+                    totalScore += project.score || 0;
+                    
+                    if (project.score > maxScore) maxScore = project.score;
+                    if (project.score < minScore) minScore = project.score;
+                });
+                
+                const avgScore = totalProjects > 0 ? Math.round(totalScore / totalProjects) : 0;
+                
+                const statsHTML = `
+                    <h3>游戏结算证明</h3>
+                    <div class="stats-container">
+                        <div class="stats-header">玩家数据统计</div>
+                        <div class="stats-item">
+                            <span class="stats-label">玩家昵称:</span>
+                            <span class="stats-value">${appData.player.nickname}${appData.player.isEternal ? ' <i class="fas fa-crown" style="color: var(--eternal-gold);"></i>' : ''}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">注册时间:</span>
+                            <span class="stats-value">${formatDate(appData.player.registerDate)}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">总项目数:</span>
+                            <span class="stats-value">${totalProjects}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">总天数:</span>
+                            <span class="stats-value">${totalDays}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">高潮日:</span>
+                            <span class="stats-value">${totalHighlightDays}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">禁欲日:</span>
+                            <span class="stats-value">${totalRestrictedDays}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">总分数:</span>
+                            <span class="stats-value">${totalScore}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">平均分数:</span>
+                            <span class="stats-value">${avgScore}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">最高分:</span>
+                            <span class="stats-value">${maxScore}</span>
+                        </div>
+                        <div class="stats-item">
+                            <span class="stats-label">最低分:</span>
+                            <span class="stats-value">${minScore === Infinity ? 0 : minScore}</span>
+                        </div>
+                        <div class="stats-footer">
+                            数据统计截止至 ${formatDateTime(today)}
+                        </div>
+                    </div>
+                `;
+                
+                showModal('游戏结算证明', statsHTML);
+            } catch (error) {
+                console.error('生成统计信息时出错:', error);
+                showModal('游戏结算证明', '<p>生成统计信息时出错，请稍后重试。</p>');
+            }
+        }
+
+        function showDataOptions() {
+            const modalContent = `
+                <h3>数据管理</h3>
+                <div class="rules-explanation">
+                    <p>管理您的游戏数据，包括导入、导出和重置。</p>
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-primary" id="exportDataBtn">
+                        <i class="fas fa-download"></i> 导出数据
+                    </button>
+                    <button class="btn" id="importDataBtn">
+                        <i class="fas fa-upload"></i> 导入数据
+                    </button>
+                    <button class="btn btn-danger" id="resetDataBtn">
+                        <i class="fas fa-trash"></i> 重置数据
+                    </button>
+                </div>
+            `;
+            
+            showModal('数据管理', modalContent);
+            
+            document.getElementById('exportDataBtn').addEventListener('click', exportData);
+            document.getElementById('importDataBtn').addEventListener('click', importData);
+            document.getElementById('resetDataBtn').addEventListener('click', resetData);
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `高潮管理日历_${formatDate(new Date())}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showModal('导出成功', '<p>数据已成功导出！</p>');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        
+                        if (!validateImportedData(importedData)) {
+                            throw new Error('数据格式不正确');
+                        }
+                        
+                        showConfirmModal('导入确认', '<p>导入数据将覆盖当前所有数据，确定要继续吗？</p>')
+                            .then(confirmed => {
+                                if (confirmed) {
+                                    Object.assign(appData, importedData);
+                                    saveData();
+                                    checkRegistration();
+                                    updateProjectDisplay();
+                                    updateCalendar();
+                                    
+                                    showModal('导入成功', '<p>数据已成功导入！</p>');
+                                }
+                            });
+                    } catch (error) {
+                        console.error('导入数据失败:', error);
+                        showModal('导入失败', `<p>导入数据失败：${error.message}</p>`);
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function resetData() {
+            showConfirmModal('重置确认', '<p>确定要重置所有数据吗？此操作不可逆！</p>')
+                .then(confirmed => {
+                    if (confirmed) {
+                        localStorage.removeItem('orgasmManagerData');
+                        location.reload();
+                    }
+                });
+        }
+
+        function showContactModal() {
+            const modalContent = `
+                <div class="contact-modal">
+                    <h2>联系作者</h2>
+                    <p>感谢大家对 XrayPapa 的支持与陪伴！</p>
+                    <p>如果这款高潮管理日历游戏对你的自律之旅有所帮助，欢迎联系作者进行赏赞支持。</p>
+                    <p>每一位赏赞的玩家，都将被永久记录在永恒者丰碑上，镌刻你的功名与荣耀。</p>
+                    <p>选择以下方式联系作者XrayPapa！</p>
+
+                    <div class="contact-grid">
+                        <!-- X (Twitter) -->
+                        <div class="btn twitter" data-link="https://x.com/xraypapagame?s=21">
+                            <i class="fab fa-x-twitter"></i> X 主页
+                            <div class="copy-hint">链接已复制</div>
+                        </div>
+                        <div class="btn qr" data-qr="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://x.com/xraypapagame?s=21" data-title="X (Twitter)">
+                            <i class="fas fa-qrcode"></i> 扫码
+                        </div>
+
+                        <!-- Telegram 个人 -->
+                        <div class="btn telegram" data-link="https://t.me/XrayPapaGame">
+                            <i class="fab fa-telegram"></i> TG 个人
+                            <div class="copy-hint">链接已复制</div>
+                        </div>
+                        <div class="btn qr" data-qr="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://t.me/XrayPapaGame" data-title="Telegram 个人">
+                            <i class="fas fa-qrcode"></i> 扫码
+                        </div>
+
+                        <!-- Telegram 频道 -->
+                        <div class="btn channel" data-link="https://t.me/XrayPapa">
+                            <i class="fab fa-telegram-plane"></i> TG 频道
+                            <div class="copy-hint">链接已复制</div>
+                        </div>
+                        <div class="btn qr" data-qr="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://t.me/XrayPapa" data-title="Telegram 频道">
+                            <i class="fas fa-qrcode"></i> 扫码
+                        </div>
+                    </div>
+
+                    <p class="tip">
+                        点击按钮即可复制链接，若未跳转可粘贴到浏览器。<br>
+                        点击"扫码"按钮可长按图片扫描二维码。
+                    </p>
+                </div>
+            `;
+            
+            showModal('联系作者', modalContent);
+            
+            // 添加联系按钮事件
+            document.querySelectorAll('.btn[data-link]').forEach(btn => {
+                const link = btn.dataset.link;
+                const hint = btn.querySelector('.copy-hint');
+                btn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(link).then(() => {
+                        hint.classList.add('show');
+                        setTimeout(() => hint.classList.remove('show'), 1500);
+                    }).catch(() => alert('复制失败：' + link));
+                    setTimeout(() => window.open(link, '_blank', 'noopener,noreferrer'), 150);
+                });
+            });
+
+            // 显示二维码
+            document.querySelectorAll('.btn[data-qr]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('qrTitle').textContent = btn.dataset.title;
+                    document.getElementById('qrImage').src = btn.dataset.qr;
+                    document.getElementById('qrContainer').classList.add('show');
+                });
+            });
+        }
+
+        function closeQR() {
+            document.getElementById('qrContainer').classList.remove('show');
+        }
+
+        // 辅助函数
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function formatDate(date) {
+            if (!date) return '';
+            if (!(date instanceof Date) || isNaN(date.getTime())) return '';
+            
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}年${month}月${day}日`;
+        }
+
+        function formatDateShort(date) {
+            if (!date) return '';
+            if (!(date instanceof Date) || isNaN(date.getTime())) return '';
+            
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${month}.${day}`;
+        }
+
+        function formatDateTime(date) {
+            if (!date) return '';
+            if (!(date instanceof Date) || isNaN(date.getTime())) return '';
+            
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${year}年${month}月${day}日 ${hours}:${minutes}`;
+        }
+
+        function getModeText(mode) {
+            const modeMap = {
+                easy: '简单',
+                normal: '一般',
+                hard: '困难'
+            };
+            return modeMap[mode] || mode;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                waiting: '待开始',
+                active: '进行中',
+                completed: '已完成'
+            };
+            return statusMap[status] || status;
+        }
+
+        // 初始化应用
+        initApp();
+    </script>
+</body>
+</html>

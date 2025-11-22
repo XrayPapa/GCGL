@@ -131,6 +131,22 @@
             overflow: hidden;
         }
 
+        .header-content {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .title-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
         .main-title {
             font-size: 1.8rem;
             font-weight: 900;
@@ -199,6 +215,32 @@
         @keyframes subtitleFloat {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-2px); }
+        }
+
+        .announcement-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--glow-primary);
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .announcement-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-50%) translateY(-1px);
+            box-shadow: 0 0 15px rgba(76, 75, 219, 0.5);
         }
 
         .content-area {
@@ -515,6 +557,19 @@
             font-weight: bold;
             color: var(--primary);
             font-family: 'Orbitron', sans-serif;
+        }
+
+        .eternal-modal-title {
+            color: var(--eternal-gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .eternal-modal-title i {
+            color: var(--eternal-gold);
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.7);
         }
 
         .modal-close {
@@ -1149,11 +1204,41 @@
             transition: all 0.3s;
             border-radius: 8px;
             width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .eternal-item:hover {
             background: var(--bg-card-hover);
             transform: translateX(5px);
+        }
+
+        .eternal-nameplate {
+            background: linear-gradient(135deg, var(--eternal-gold), #DAA520);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+            font-size: 1.1rem;
+            position: relative;
+            animation: eternalNameShine 3s infinite alternate;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        @keyframes eternalNameShine {
+            0% {
+                text-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+            }
+            100% {
+                text-shadow: 0 0 15px rgba(212, 175, 55, 0.7), 0 0 20px rgba(212, 175, 55, 0.5);
+            }
+        }
+
+        .eternal-crown {
+            color: var(--eternal-gold);
+            font-size: 1rem;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.7);
         }
 
         .ticket {
@@ -1240,10 +1325,11 @@
             font-size: 0.7rem;
             font-weight: bold;
             padding: 2px 6px;
-            border: 2px solid var(--eternal-purple);
+            border: 2px solid var(--eternal-gold);
             border-radius: 3px;
             transform: none;
             opacity: 0.9;
+            background: rgba(255, 215, 0, 0.1);
         }
 
         .ticket-info {
@@ -1704,6 +1790,26 @@
             color: var(--primary);
         }
 
+        /* 项目批准人特殊流光效果 */
+        .project-ticket .auth-value.approver {
+            background: linear-gradient(90deg, #4C4BDB, #A569E0, #4C4BDB);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* 永恒者执行人特殊样式 */
+        .project-ticket .auth-value.executor.eternal {
+            color: var(--eternal-gold);
+        }
+
         .project-ticket .qrcode-container {
             display: flex;
             flex-direction: column;
@@ -2101,14 +2207,94 @@
             cursor: pointer;
             font-weight: 600;
         }
+
+        /* 公告模态窗口样式 */
+        .announcement-modal {
+            max-width: 360px;
+            max-height: 480px;
+            overflow-y: auto;
+        }
+
+        .announcement-content {
+            padding: 20px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .announcement-greeting {
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .announcement-greeting .player-name {
+            color: var(--primary);
+        }
+
+        .announcement-greeting .player-name.eternal {
+            background: linear-gradient(135deg, var(--gold-color), #DAA520);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .announcement-greeting .time-period {
+            color: var(--secondary);
+        }
+
+        .announcement-body {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .announcement-footer {
+            text-align: right;
+            margin-top: 30px;
+            border-top: 1px dashed var(--border);
+            padding-top: 15px;
+        }
+
+        .announcement-date {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .announcement-signature {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            background: linear-gradient(90deg, #4C4BDB, #A569E0, #4C4BDB);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+
+        /* 永恒者模态窗口特殊样式 */
+        .eternal-modal .modal {
+            border: 1px solid var(--eternal-gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .eternal-modal .modal-header {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(255, 215, 0, 0.05));
+        }
     </style>
 </head>
 <body>
     <div class="outer-container">
         <div id="app-container">
             <div class="header glass">
-                <div class="main-title">高潮管理日历</div>
-                <div class="sub-title">@XrayPapaGame</div>
+                <div class="header-content">
+                    <div class="title-container">
+                        <div class="main-title">高潮管理日历</div>
+                        <div class="sub-title">@XrayPapaGame</div>
+                    </div>
+                    <button class="announcement-btn" id="announcementBtn">
+                        <i class="fas fa-bullhorn"></i> 公告
+                    </button>
+                </div>
             </div>
 
             <div class="content-area">
@@ -2353,7 +2539,6 @@
             "我不不禁止你的高潮，只是在观察你能忍多久",
             "我控制系统，你控制自己——公平交易",
             "我写下规则，你选择遵守或挣扎",
-
         ];
 
         const appContainer = document.getElementById('app-container');
@@ -2408,6 +2593,9 @@
         const qrImage = document.getElementById('qrImage');
         const qrTitle = document.getElementById('qrTitle');
         const closeQrBtn = document.getElementById('closeQrBtn');
+
+        // 新增公告按钮
+        const announcementBtn = document.getElementById('announcementBtn');
 
         let homePlaying = false;
         let homeAbort = false;
@@ -2738,6 +2926,9 @@
             qrContainer.addEventListener('click', (e) => {
                 if (e.target === qrContainer) closeQR();
             });
+            
+            // 公告按钮事件
+            announcementBtn.addEventListener('click', showAnnouncement);
         }
 
         function switchPage(pageId) {
@@ -3394,11 +3585,11 @@
                             <div class="auth-info">
                                 <div class="auth-item">
                                     <div class="auth-label">项目批准人</div>
-                                    <div class="auth-value">XrayPapa</div>
+                                    <div class="auth-value approver">XrayPapa</div>
                                 </div>
                                 <div class="auth-item">
                                     <div class="auth-label">项目执行人</div>
-                                    <div class="auth-value">${appData.player ? appData.player.nickname : '未注册用户'}${appData.player && appData.player.isEternal ? ' <i class="fas fa-crown" style="color: var(--eternal-gold);"></i>' : ''}</div>
+                                    <div class="auth-value executor ${appData.player && appData.player.isEternal ? 'eternal' : ''}">${appData.player ? appData.player.nickname : '未注册用户'}${appData.player && appData.player.isEternal ? ' <i class="fas fa-crown" style="color: var(--eternal-gold);"></i>' : ''}</div>
                                 </div>
                             </div>
 
@@ -3830,10 +4021,24 @@
         function showEternalList() {
             let listHTML = '<div class="eternal-list">';
             eternalList.forEach(name => {
-                listHTML += `<div class="eternal-item">${name}</div>`;
+                listHTML += `
+                    <div class="eternal-item">
+                        <i class="fas fa-crown eternal-crown"></i>
+                        <span class="eternal-nameplate">${name}</span>
+                    </div>
+                `;
             });
             listHTML += '</div>';
             listHTML += '<p style="margin-top: 15px; text-align: center; font-style: italic;">永恒者丰碑记录对XrayPapa赏赞的玩家信息，感谢各位长久以来的信任和支持！</p>';
+            
+            // 设置永恒者模态窗口的特殊样式
+            const modal = document.querySelector('.modal');
+            modal.classList.add('eternal-modal');
+            
+            // 更新模态窗口标题
+            const modalTitle = document.querySelector('.modal-title');
+            modalTitle.classList.add('eternal-modal-title');
+            modalTitle.innerHTML = '<i class="fas fa-crown"></i> 永恒者丰碑';
             
             showModal('永恒者丰碑', listHTML);
         }
@@ -4177,6 +4382,52 @@
 
         function closeQR() {
             document.getElementById('qrContainer').classList.remove('show');
+        }
+
+        // 公告功能
+        function showAnnouncement() {
+            const now = new Date();
+            const hours = now.getHours();
+            let timePeriod = '';
+            
+            if (hours >= 6 && hours < 12) {
+                timePeriod = '上午';
+            } else if (hours >= 12 && hours < 14) {
+                timePeriod = '中午';
+            } else if (hours >= 14 && hours < 18) {
+                timePeriod = '下午';
+            } else {
+                timePeriod = '晚上';
+            }
+            
+            const playerName = appData.player ? appData.player.nickname : '玩家';
+            const isEternal = appData.player && appData.player.isEternal;
+            
+            const modalContent = `
+                <div class="announcement-modal">
+                    <div class="announcement-content">
+                        <div class="announcement-greeting">
+                            <span class="player-name ${isEternal ? 'eternal' : ''}">${playerName}${isEternal ? ' <i class="fas fa-crown"></i>' : ''}</span>，<span class="time-period">${timePeriod}</span>好：
+                        </div>
+                        <div class="announcement-body">
+                            <p>本次更新新增公告栏功能：</p>
+                            <ul>
+                                <li>首页文字轮播面板开放投稿，可在X或telegram上私信XrayPapa需要展示的文字内容；</li>
+                                <li>旧版本双色球玩法将在后续更新重新加入，作为新的难度模式提供选择；</li>
+                                <li>对高潮管理游戏有更好的优化建议可及时联系XrayPapa，期待反馈；</li>
+                                <li>XrayPapa制作的所有内容都是免费公开的，自行取用；</li>
+                            </ul>
+                            <p>再次感谢所有永恒者，祝大家身体健康吧！</p>
+                        </div>
+                        <div class="announcement-footer">
+                            <div class="announcement-date">2025年11月23日</div>
+                            <div class="announcement-signature">XrayPapa</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            showModal('XrayPapa的信息告知栏', modalContent);
         }
 
         // 辅助函数
